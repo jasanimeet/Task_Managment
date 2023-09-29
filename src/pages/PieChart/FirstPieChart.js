@@ -5,9 +5,8 @@ import { API_BASE_URL } from "../../config/API/api.config";
 import { Box, CircularProgress } from "@mui/material";
 
 const FirstPieChart = React.memo(({
-  setChartTable, setItemData
+  setChartTable, setItemData, activeChartDefault, setActiveChartDefault
 }) => {
-  // console.log("BaseURL",BaseURL);
   const [chartDataCount, setChartDataCount] = useState([]);
   const [chartDataDepartment, setChartDataDepartment] = useState([]);
   const [selectData, setSelectData] = React.useState("");
@@ -86,7 +85,7 @@ const FirstPieChart = React.memo(({
       const isSelected = chartDataConvert[selection.row + 1]?.[3] === 1 ? 0 : 1;
       chartDataConvert[selection.row + 1][3] = isSelected;
       setActivChart([...chartDataConvert]);
-
+      setActiveChartDefault();
       setSelectedChartData({ category, value });
       setItemData({ category, value })
     }
@@ -119,7 +118,7 @@ const FirstPieChart = React.memo(({
       {/* <div style={{ width: "29%" }}> */}
           <Chart
             chartType="PieChart"
-            data={activChart ? activChart : chartDataConvert}
+            data={(activeChartDefault === 3  && activChart) ? activChart : chartDataConvert}
             options={options}
             width={"100%"}
             height={"250px"}

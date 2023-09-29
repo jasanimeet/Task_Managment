@@ -32,6 +32,8 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const [activeTab, setActiveTab] = useState("");
   const [loader, setLoader] = useState(true);
   const [userName, setUserName] = useState('');
+  const [activeChartDefault, setActiveChartDefault] = useState(0);
+
   console.log("userName",userName);
   const handleInputChange = (event) => {
     // Update the userName state with the new value from the input field
@@ -182,10 +184,14 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   
       // Update the chart data to trigger a re-render with the new selection status
       setActivChart([...chartDataConvert]);
-  
+      setActiveChartDefault(2);
       // Handle the selected chart data
       setSelectedChartData({ category, value });
     }
+  };
+
+  const activeChartDefaultUpdate = () => {
+    setActiveChartDefault(3)
   };
   
 
@@ -207,6 +213,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
     setSelectedChartData(null);
     setClickIdGet(id);
     setActiveTab(id);
+    setActiveChartDefault(1)
   };
 
   const [showEmployeeInfo, setShowEmployeeInfo] = useState(false);
@@ -387,9 +394,6 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const handleContextMenuPreparing = (e) => {
     const customItems = [];
     if (e.target === "content" && e.column.dataField === "task") {
-      {
-        console.log("text", e.target, "***", e?.row?.data?.task);
-      }
       customItems.push({
         text: e?.row?.data?.task,
         onItemClick: () => {
@@ -478,7 +482,7 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: activeTab === "ACTIVE" ? "#ffff99" : "",
+                  background: (activeChartDefault === 1 && activeTab === "ACTIVE" ? "#ffff99" : ""),
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -491,7 +495,7 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: activeTab === "INACTIVE" ? "#ffc299" : "",
+                  background: (activeChartDefault === 1 && activeTab === "INACTIVE" ? "#ffc299" : ""),
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -504,7 +508,7 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: activeTab === "CLOSE" ? "#99ffbb" : "",
+                  background: (activeChartDefault === 1 && activeTab === "CLOSE" ? "#99ffbb" : ""),
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -532,7 +536,7 @@ const handleDropDownChange = (event) => {
             <div style={{ width: "29%" }}>
               <Chart
                 chartType="PieChart"
-                data={ activChart ? activChart : chartDataConvert}
+                data={ (activeChartDefault === 2 && activChart) ? activChart : chartDataConvert}
                 options={options}
                 width={"100%"}
                 height={"250px"}
@@ -549,6 +553,8 @@ const handleDropDownChange = (event) => {
               <FirstPieChart
                 setChartTable={setChartTable}
                 setItemData={setItemData}
+                setActiveChartDefault={activeChartDefaultUpdate}
+                activeChartDefault={activeChartDefault}
               />
             </div>
             {!loader && (
@@ -560,7 +566,7 @@ const handleDropDownChange = (event) => {
         </>
          {/* )} */}
       </div>
-      <input 
+      {/* <input 
         name="user"
         type="text"
         value={userName}
@@ -573,7 +579,7 @@ const handleDropDownChange = (event) => {
   <option>Audi</option>
 </datalist>
       <button onClick={saveLayout}>Save Layout</button>
-      <button onClick={loadLayout}>Load Layout</button>
+      <button onClick={loadLayout}>Load Layout</button> */}
       {/* } */}
       {!loader && (
       <DataGrid
