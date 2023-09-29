@@ -1,0 +1,41 @@
+.filter-main{
+    width: 15%;
+    padding-top: 45px;
+    display: flex;
+}
+.filter-main p {
+    border: 1px solid;
+}
+.filter-btn{
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.dx-datagrid-headers {
+ color: black !important;
+ border-radius: 8px;
+}
+
+.active{
+    color: blue;
+    font-weight: 600;
+}
+.filter-btn{
+    align-items: center;
+    display: flex;
+}
+.clear-button {
+    background-color: #337ab7;
+    color: #ffffff; 
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .clear-button:hover {
+    background-color: #78bcf8; 
+  }
+  

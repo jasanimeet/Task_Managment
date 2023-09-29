@@ -1,0 +1,14 @@
+.bullet {
+    /* Set your desired height here */
+    height: 30px; /* Adjust the value as needed */
+  }
+  .caption-two-lines {
+    width: 0;
+  overflow: visible;
+  }
+
+  .table-header{
+    width: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }

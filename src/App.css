@@ -1,0 +1,166 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+h1, p {
+  font-family: Lato;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.dx-datagrid .dx-data-row > td.bullet {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@media print{
+	.hide-on-print{
+		display: none;
+	}
+}
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+body {
+  background-color: #f2f2f2;
+}
+
+.invoice {
+  background-color: #fff;
+  width: 800px; /* Adjust width to match standard invoice size */
+  margin: 0 auto; /* Center the form horizontally */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.invoice-form {
+  margin-bottom: 20px;
+}
+
+.invoice-form label {
+  display: inline-block;
+  width: 150px; /* Adjust label width as needed */
+  font-weight: bold;
+  color: #333;
+  vertical-align: middle;
+}
+
+.invoice-form input[type="text"],
+.invoice-form input[type="number"] {
+  width: calc(100% - 200px); /* Adjust input width based on label width */
+  height: 30px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #555;
+  vertical-align: middle;
+}
+
+.invoice-form textarea {
+  width: calc(100% - 200px); /* Adjust textarea width based on label width */
+  height: 50px; /* Adjust textarea height as needed */
+  padding: 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #000;
+  color: #fff;
+  font-size: 18px; /* Adjust textarea font size as needed */
+  vertical-align: middle;
+}
+
+.invoice-form hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.invoice-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.invoice-footer .box {
+  border: 1px solid #000;
+  padding: 10px;
+  width: 150px;
+  height: 100px;
+}
+
+.print-button {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.print-button button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.print-button button:hover {
+  background-color: #45a049;
+}
+
+@media print {
+  .print-button {
+    display: none;
+  }
+}
+

@@ -1,0 +1,12 @@
+html, body { height: 100%; }
+#responsiveBox div {
+    font-size: 16px;
+    padding-top: 10px;
+    text-align: center;
+}
+.item { height: 100%; }
+.header { background: #f39e6c }
+.content { background: #f5e5a6 }
+.left-side-bar { background: #94d7c7 }
+.right-side-bar { background: #77c7e7 }
+.footer { background: #7b9bcf }
