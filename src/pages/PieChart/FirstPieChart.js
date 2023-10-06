@@ -98,7 +98,9 @@ const FirstPieChart = React.memo(({
           `/report/getcurrenttaskstatus?hold_Status=${selectedChartDatas?.category}`
       )
       .then((res) => {
-        setChartTable(res?.data?.data)
+        if(res.status !== 204){
+          setChartTable(res?.data?.data)
+        }
       });
   }, [selectedChartDatas]);
 

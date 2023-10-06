@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Devextrim from "./Devextrim";
 import DevExtrimIndex2 from './DevExtrimIndex2';
 import DevExtrimTwo from "./DevExtrimTwo";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const App = () => {
   const [selectedView, setSelectedView] = useState("Option 1");
@@ -53,6 +56,7 @@ const App = () => {
         </div>
       </div>
       {selectedView === "Option 2" ? <DevExtrimTwo selectedData={selectedData} setSelectedData={setSelectedData}/> : <Devextrim setSelectedView={setSelectedView} setSelectedData={setSelectedData}/>}
+      <ToastContainer />
     </div>
   );
 };

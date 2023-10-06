@@ -323,7 +323,7 @@ const DevExtrimTwo = ({ selectedData, setSelectedData }) => {
       </select>
       <DataGrid
         id="gridContainer"
-        height={650}
+        height={750}
         ref={dataGridRef}
         dataSource={tableData}
         allowColumnResizing

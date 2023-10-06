@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from "react";
 import DataGrid, {
   Column,
@@ -20,6 +18,7 @@ import "devextreme/dist/css/dx.light.css";
 import DiscountCell from "./common/DiscountCell";
 import "./css/Devextrim.css";
 import { Box, CircularProgress } from "@mui/material";
+import { toast } from "react-toastify";
 
 const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const [chartData, setChartData] = useState([]);
@@ -31,10 +30,11 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const [selectOption, setSelectOption] = useState();
   const [activeTab, setActiveTab] = useState("");
   const [loader, setLoader] = useState(true);
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState("");
   const [activeChartDefault, setActiveChartDefault] = useState(0);
-
-  console.log("userName",userName);
+  const [layoutDropDown, setLayoutDropDown] = useState([]);
+  const [selectedLayout, setSelectedLayout] = useState("");
+console.log("activeChartDefault",activeChartDefault);
   const handleInputChange = (event) => {
     // Update the userName state with the new value from the input field
     setUserName(event.target.value);
@@ -94,7 +94,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const finishedData = getCountByStatusFlag("CLOSE");
 
   const getChartDataDepart = () => {
-    setLoader(true)
+    setLoader(true);
     axios
       .get(
         API_BASE_URL + `/report/getcurrenttaskstatus?department=${selectData}`
@@ -102,8 +102,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
       .then((res) => {
         setChartDataDepartment(res?.data?.data);
         setTimeout(() => {
-          
-          setLoader(false)
+          setLoader(false);
         }, 3000);
       });
   };
@@ -135,7 +134,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   };
 
   const convertApiDataToChartData = (data) => {
-    const closefilter = data.map((x) => x.task_status);
+    const closefilter = data?.map((x) => x.task_status);
 
     const closeCount = closefilter.filter((item) => item === "CLOSE").length;
     const counterCount = closefilter.filter((item) => item === "HOLD").length;
@@ -167,21 +166,21 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
 
   const chartDataConvert = convertApiDataToChartData(chartDataDepartment);
   const [selectedChartData, setSelectedChartData] = useState(null);
-  const [activChart, setActivChart] = useState('');
+  const [activChart, setActivChart] = useState("");
 
   const handleChartSelect = ({ chartWrapper }) => {
     const chart = chartWrapper?.getChart?.();
     const chartDataConverToNew = convertApiDataToChartData(chartDataDepartment);
-  
+
     if (chart && chart.getSelection().length === 1) {
       const selection = chart.getSelection()[0];
       const category = chartDataConverToNew[selection.row + 1]?.[0];
       const value = chartDataConverToNew[selection.row + 1]?.[1];
-  
+
       // Toggle selection status
       const isSelected = chartDataConvert[selection.row + 1]?.[3] === 1 ? 0 : 1;
       chartDataConvert[selection.row + 1][3] = isSelected;
-  
+
       // Update the chart data to trigger a re-render with the new selection status
       setActivChart([...chartDataConvert]);
       setActiveChartDefault(2);
@@ -191,9 +190,11 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   };
 
   const activeChartDefaultUpdate = () => {
-    setActiveChartDefault(3)
+    setActiveChartDefault(3);
   };
-  
+  const activeStackBarChartDefaultUpdate = () => {
+    setActiveChartDefault(4);
+  };
 
   useEffect(() => {
     // setLoader(true)
@@ -203,7 +204,9 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
           `/report/getcurrenttaskstatus?task_Status=${selectedChartData?.category}`
       )
       .then((res) => {
-        setChartTable(res?.data?.data);
+        if(res.status !== 204){
+          setChartTable(res?.data?.data)
+        }
         // setLoader(false)
       });
   }, [selectedChartData, clickIdGet]);
@@ -213,7 +216,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
     setSelectedChartData(null);
     setClickIdGet(id);
     setActiveTab(id);
-    setActiveChartDefault(1)
+    setActiveChartDefault(1);
   };
 
   const [showEmployeeInfo, setShowEmployeeInfo] = useState(false);
@@ -240,11 +243,7 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
 
   const renderGridCellDepartment = (data) => {
     if (data && data?.data?.prv_stage !== null) {
-      return (
-        <div style={{fontWeight: "bold" }}>
-          {data.displayValue}
-        </div>
-      );
+      return <div style={{ fontWeight: "bold" }}>{data.displayValue}</div>;
     } else {
       return <div>{data.displayValue}</div>;
     }
@@ -322,32 +321,6 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
     }
   };
 
-  // const renderGrideCellWholeTask = (data) =>{
-  //   const today = Date.now();
-  //   const toDayaDate = (new Intl.DateTimeFormat('en-US', {year: 'numeric', month: '2-digit',day: '2-digit'}).format(today));
-
-  //   function formatDate(toDayaDate) {
-  //     // Split the input date into components
-  //     const dateComponents = toDayaDate.split('/');
-
-  //     // Rearrange the components in the desired format (DD-MM-YYYY)
-  //     const formattedDate = `${dateComponents[1]}-${dateComponents[0]}-${dateComponents[2]}`;
-  //     return formattedDate;
-  //   }
-
-  //   // Example usage
-  //   const formattedDate = formatDate(toDayaDate);
-  // console.log("formattedDate",formattedDate);
-  // console.log(">>>>>>>>>>",data.displayValue , formattedDate);
-
-  //   if(data.displayValue){
-  //     return <div style={{color: data.displayValue > formattedDate ? 'red' : 'black'}}>{data.displayValue}</div>
-  //   }else{
-  //     return <div >{data.displayValue}</div>
-
-  //   }
-  // }
-
   const renderGrideCellWholeTask = (data) => {
     const today = new Date();
     const formattedDate = new Date(data.displayValue);
@@ -407,56 +380,98 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
     }
   };
 
-
   const dataGrid = useRef(null);
+  useEffect(() => {
+    axios.get(API_BASE_URL + `/Report/get_layouts`).then((res) => {
+      setLayoutDropDown(res?.data?.data);
+    });
+  }, []);
 
-// Saving the layout
-const saveLayout = () => {
-  console.log("savesave");
-  const dataGridState = dataGridRef.current.instance.state();
-  console.log("dataGridState",dataGridState);
-  localStorage.setItem('datagrid_layout', JSON.stringify(dataGridState));
-  localStorage.setItem('user_layout', userName);
-};
+  useEffect(() => {
+    axios
+      .get(
+        API_BASE_URL +
+          `/Report/get_layout_details?layout_name=${selectedLayout}`
+      )
+      .then((res) => {
+        const newData = res?.data?.data?.map(
+          ({ layout_detail_id, layout_id, ...rest }) => rest
+        );
+        localStorage.setItem("datagrid_layout", JSON.stringify(newData));
+      });
+  }, [selectedLayout]);
 
-// Loading the layout
-const loadLayout = () => {
-  const savedLayout = localStorage.getItem('datagrid_layout');
-  console.log("savedLayout",savedLayout);
-  if (savedLayout) {
-    const parsedLayout = JSON.parse(savedLayout);
-    console.log("parsedLayout",parsedLayout);
-    dataGridRef?.current?.instance?.state(parsedLayout);
+  // Saving the layout
+  const saveLayout = () => {
+    const dataGridState = dataGridRef.current.instance.state().columns;
+
+    const updatedArray = dataGridState?.map((item) => {
+      return {
+        ...item,
+        fixed_value: item.fixed,
+      };
+    });
+
+    updatedArray.forEach((item) => {
+      delete item.fixed;
+    });
+    // console.log("dataGridState",JSON.stringify(dataGridState));
+    // localStorage.setItem('user_layout', userName);
+    console.log("userName",userName);
+if(userName){
+    const body = {
+      layout_id: 0,
+      layout_name: userName,
+      Detail_List: updatedArray,
+    };
+    axios
+      .post(API_BASE_URL + `/report/create_update_layout`, body)
+      .then((res) => {
+        // console.log("resss",res);
+        toast.success("Layout save successfully.", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      });
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedLayout(selectedValue);
+
+    setTimeout(() => {
+      const savedLayout = localStorage?.getItem("datagrid_layout");
+      if (savedLayout) {
+        const parsedLayout = JSON?.parse(savedLayout);
+        if (parsedLayout && dataGridRef?.current?.instance?.state) {
+          // Create a new object with the updated 'searchText' property
+          const updatedState = {
+            ...dataGridRef.current.instance.state,
+            columns: parsedLayout,
+          };
+          // Update the 'state' object with the new 'searchText'
+          dataGridRef.current.instance.state(updatedState);
+        }
+      }
+    }, 500);
+  };
+
+  if (loader) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          width: "100%",
+          // height: '100vh',
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress color="secondary" />{" "}
+      </Box>
+    );
   }
-};
 
-// Ensure that the DataGrid uses the saved layout when the component loads
-useEffect(() => {
-  loadLayout();
-}, []);
-
-
-const handleDropDownChange = (event) => {
-  const newUserName = event.target.value;
-  setUserName(newUserName);
-  // Save the new username in localStorage
-  localStorage.setItem('user_name', newUserName);
-};
-  if(loader){
-    return(
-    <Box
-            sx={{
-              display: "flex",
-              width: '100%',
-              // height: '100vh',
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CircularProgress color="secondary" />{" "}
-          </Box>
-    )
-  }
   return (
     <div>
       {/* { loader ? "" :
@@ -474,7 +489,7 @@ const handleDropDownChange = (event) => {
       ):( <> */}
       {/* {loader ?
     <p>demo</p>  :  */}
-     
+
       <div style={{ display: "flex", height: "250px" }}>
         <div style={{ width: "13%", paddingTop: "45px" }}>
           <table style={{ border: "1px solid black" }}>
@@ -482,7 +497,10 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: (activeChartDefault === 1 && activeTab === "ACTIVE" ? "#ffff99" : ""),
+                  background:
+                    activeChartDefault === 1 && activeTab === "ACTIVE"
+                      ? "#ffff99"
+                      : "",
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -495,7 +513,10 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: (activeChartDefault === 1 && activeTab === "INACTIVE" ? "#ffc299" : ""),
+                  background:
+                    activeChartDefault === 1 && activeTab === "INACTIVE"
+                      ? "#ffc299"
+                      : "",
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -508,7 +529,10 @@ const handleDropDownChange = (event) => {
               <td
                 style={{
                   border: "1px solid black",
-                  background: (activeChartDefault === 1 && activeTab === "CLOSE" ? "#99ffbb" : ""),
+                  background:
+                    activeChartDefault === 1 && activeTab === "CLOSE"
+                      ? "#99ffbb"
+                      : "",
                   paddingRight: "10px",
                   cursor: "pointer",
                 }}
@@ -530,428 +554,469 @@ const handleDropDownChange = (event) => {
             }}
           >
             {/* <CircularProgress color="secondary" />{" "} */}
-          {/* </Box> */}
-        {/* ) : ( */} 
-          <>
+        {/* </Box> */}
+        {/* ) : ( */}
+        <>
+          <div style={{ width: "29%" }}>
+            <Chart
+              chartType="PieChart"
+              data={
+                activeChartDefault === 2 && activChart
+                  ? activChart
+                  : chartDataConvert
+              }
+              options={options}
+              width={"100%"}
+              height={"250px"}
+              chartEvents={[
+                {
+                  eventName: "select",
+                  callback: handleChartSelect,
+                },
+              ]}
+            />
+          </div>
+
+          <div style={{ width: "29%" }}>
+            <FirstPieChart
+              setChartTable={setChartTable}
+              setItemData={setItemData}
+              setActiveChartDefault={activeChartDefaultUpdate}
+              activeChartDefault={activeChartDefault}
+            />
+          </div>
+          {!loader && (
             <div style={{ width: "29%" }}>
-              <Chart
-                chartType="PieChart"
-                data={ (activeChartDefault === 2 && activChart) ? activChart : chartDataConvert}
-                options={options}
-                width={"100%"}
-                height={"250px"}
-                chartEvents={[
-                  {
-                    eventName: "select",
-                    callback: handleChartSelect,
-                  },
-                ]}
+              {/* <SecondPieChart /> */}
+              <StackBarChart 
+              setChartTable={setChartTable}
+              setItemData={setItemData}
+              setActiveChartDefault={activeStackBarChartDefaultUpdate}
+              activeChartDefault={activeChartDefault}
               />
             </div>
-        
-            <div style={{ width: "29%" }}>
-              <FirstPieChart
-                setChartTable={setChartTable}
-                setItemData={setItemData}
-                setActiveChartDefault={activeChartDefaultUpdate}
-                activeChartDefault={activeChartDefault}
-              />
-            </div>
-            {!loader && (
-                  <div style={{ width: "29%" }}>
-          {/* <SecondPieChart /> */}
-          <StackBarChart />
-        </div>
-         )}
+          )}
         </>
-         {/* )} */}
+        {/* )} */}
       </div>
-      {/* <input 
-        name="user"
-        type="text"
-        value={userName}
-        onChange={handleInputChange} 
-      />
-<datalist id="cars">
-  <option>Volvo</option>
-  <option>Saab</option>
-  <option>Mercedes</option>
-  <option>Audi</option>
-</datalist>
-      <button onClick={saveLayout}>Save Layout</button>
-      <button onClick={loadLayout}>Load Layout</button> */}
-      {/* } */}
-      {!loader && (
-      <DataGrid
-        id="gridContainer"
-        ref={dataGridRef}
-        height={650}
-        dataSource={selectedChartData || itemData ? chartTable : chartData}
-        // keyExpr="due_days"
-        allowColumnResizing
-        allowColumnReordering={true}
-        hoverStateEnabled={true}
-        columnAutoWidth={true}
-        // customizeColumns={customizeColumns}
-        onSelectionChanged={handleSelectionChanged}
-        showBorders={true}
-        onContextMenuPreparing={handleContextMenuPreparing}
-      >
-        <GroupPanel visible={true} />
-        <FilterRow visible applyFilter={currentFilter} />
-        <HeaderFilter visible />
-        <SearchPanel visible={true} width={240} placeholder="Search..." />
-        <Selection mode="single" />
-        <Column
-          dataField="status"
-          fixed={true}
-          caption="Active/Inactive"
-          alignment="center"
-          width={100}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>Active/</div>
-              <div style={{ textAlign: "center" }}>Inactive</div>
-            </div>
-          )}
-        >
-          <HeaderFilter />
-        </Column>
-
-        <Column
-          dataField="category"
-          alignment="center"
-          width={105}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>category</div>
-            </div>
-          )}
-        ></Column>
-        <Column alignment="center" dataField="task" width={100}  
-        headerCellRender={() => (
-            <div className="table-header">
-              <div>Task</div>
-            </div>
-          )}>
-          <HeaderFilter />
-        </Column>
-        <Column
-          dataField="stage"
-          alignment="center"
-          dataType="stage"
-          width={220}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>Stage</div>
-            </div>
-          )}
-        >
-          <HeaderFilter />
-        </Column>
-
-        <Column alignment="center" dataField="department" width={130}  
-         cellRender={renderGridCellDepartment}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>Department</div>
-            </div>
-          )}>
-          <HeaderFilter />
-        </Column>
-        <Column
-          dataField="task_status"
-          alignment="center"
-          cellRender={renderGridCell}
-          width={90}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>Task</div>
-              <div style={{ textAlign: "center" }}>Status</div>
-            </div>
-          )}
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <input
+          name="user"
+          type="text"
+          placeholder="Layout name"
+          value={userName}
+          onChange={handleInputChange}
+          autoComplete="off"
+          style={{ marginRight: "10px", padding: "5px" }} // Adjust styles as needed
         />
-        <Column
-          dataField="comper"
-          format="percent"
-          alignment="right"
-          allowGrouping={false}
-          cellRender={DiscountCell}
-          cssClass="bullet"
-          dataType="stage"
-          width={110}
-          headerCellRender={() => (
-            <div className="table-header">
-              <div>Completion</div>
-              <div style={{ textAlign: "center" }}>Status</div>
-            </div>
-          )}
+        <select
+          value={selectedLayout}
+          onChange={handleSelectChange}
+          style={{ marginRight: "10px", padding: "5px", width: "100px" }} // Adjust styles as needed
         >
-          <HeaderFilter />
-        </Column>
-
-        <Column alignment="center" caption="CURRENT STAGE PROGRESS">
+          {layoutDropDown?.map((layout) => (
+            <option key={layout?.layout_name} value={layout?.layout_name}>
+              {layout?.layout_name}
+            </option>
+          ))}
+          {/* <option>Default</option> */}
+        </select>
+        <button
+          onClick={saveLayout}
+          style={{
+            padding: "5px",
+            backgroundColor: "blue",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: "5px",
+          }} // Adjust styles as needed
+        >
+          Save Layout
+        </button>
+      </div>
+      {console.log("chartTable",chartTable)}
+      {console.log("chartTable111",itemData)}
+      {console.log("chartTable222",selectedChartData)}
+      {!loader && (
+        <DataGrid
+          id="gridContainer"
+          ref={dataGridRef}
+          height={650}
+          dataSource={selectedChartData || itemData ? chartTable : chartData}
+          // keyExpr="due_days"
+          allowColumnResizing
+          allowColumnReordering={true}
+          hoverStateEnabled={true}
+          columnAutoWidth={true}
+          // customizeColumns={customizeColumns}
+          onSelectionChanged={handleSelectionChanged}
+          showBorders={true}
+          onContextMenuPreparing={handleContextMenuPreparing}
+        >
+          <GroupPanel visible={true} />
+          <FilterRow visible applyFilter={currentFilter} />
+          <HeaderFilter visible />
+          <SearchPanel visible={true} width={240} placeholder="Search..." />
+          <Selection mode="single" />
           <Column
+            dataField="status"
+            fixed={true}
+            caption="Active/Inactive"
             alignment="center"
-            caption="Original Duration"
-            dataField="original_duration"
-            width={90}
+            width={100}
             headerCellRender={() => (
               <div className="table-header">
-                <div>Original</div>
-                <div style={{ textAlign: "center" }}>Duration</div>
+                <div>Active/</div>
+                <div style={{ textAlign: "center" }}>Inactive</div>
+              </div>
+            )}
+          >
+            <HeaderFilter />
+          </Column>
+
+          <Column
+            dataField="category"
+            alignment="center"
+            width={105}
+            headerCellRender={() => (
+              <div className="table-header">
+                <div>category</div>
+              </div>
+            )}
+          ></Column>
+          <Column
+            alignment="center"
+            dataField="task"
+            width={100}
+            headerCellRender={() => (
+              <div className="table-header">
+                <div>Task</div>
               </div>
             )}
           >
             <HeaderFilter />
           </Column>
           <Column
-            dataField="original_due_days"
-            cellRender={renderGridCellOriginalDueDays}
+            dataField="stage"
             alignment="center"
             dataType="stage"
-            width={80}
+            width={220}
             headerCellRender={() => (
               <div className="table-header">
-                <div>Original</div>
-                <div style={{ textAlign: "center" }}>Due</div>
-                <div style={{ textAlign: "center" }}>Days</div>
+                <div>Stage</div>
               </div>
             )}
           >
             <HeaderFilter />
           </Column>
-          <Column
-            alignment="center"
-            caption="Original End Date"
-            dataField="original_end_date"
-            width={100}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Original</div>
-                <div style={{ textAlign: "center" }}>End</div>
-                <div style={{ textAlign: "center" }}>Days</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-        </Column>
 
-        <Column
-          alignment="center"
-          cssClass="red-header"
-          caption="COMPLETED STAGE(S) PROGRESS"
-        >
           <Column
             alignment="center"
-            dataField="target_days"
-            width={90}
+            dataField="department"
+            width={130}
+            cellRender={renderGridCellDepartment}
             headerCellRender={() => (
               <div className="table-header">
-                <div>Target</div>
-                <div style={{ textAlign: "center" }}>Days</div>
+                <div>Department</div>
               </div>
             )}
           >
             <HeaderFilter />
           </Column>
           <Column
+            dataField="task_status"
             alignment="center"
-            caption="Days Taken"
-            dataField="task_days"
-            width={90}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Days</div>
-                <div style={{ textAlign: "center" }}>Taken</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            cellRender={renderGridCellTaskDelay}
-            caption="Task Delay Days"
-            dataField="delay_days"
+            cellRender={renderGridCell}
             width={90}
             headerCellRender={() => (
               <div className="table-header">
                 <div>Task</div>
-                <div style={{ textAlign: "center" }}>Delay</div>
-                <div style={{ textAlign: "center" }}>Days</div>
+                <div style={{ textAlign: "center" }}>Status</div>
               </div>
             )}
-          >
-            <HeaderFilter />
-          </Column>
+          />
           <Column
-            alignment="center"
-            caption="Task Hold Days"
-            dataField="hold_days"
-            width={80}
+            dataField="comper"
+            format="percent"
+            alignment="right"
+            allowGrouping={false}
+            cellRender={DiscountCell}
+            cssClass="bullet"
+            dataType="stage"
+            width={110}
             headerCellRender={() => (
               <div className="table-header">
-                <div>Task</div>
-                <div style={{ textAlign: "center" }}>Hold</div>
-                <div style={{ textAlign: "center" }}>Days</div>
+                <div>Completion</div>
+                <div style={{ textAlign: "center" }}>Status</div>
               </div>
             )}
           >
             <HeaderFilter />
           </Column>
-        </Column>
 
-        <Column alignment="center" caption="WHOLE TASK PROGRESS">
-          <Column
-            alignment="center"
-            caption="Target Days"
-            dataField="whole_target_days"
-            width={90}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Target</div>
-                <div style={{ textAlign: "center" }}>Days</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
+          <Column alignment="center" caption="CURRENT STAGE PROGRESS">
+            <Column
+              alignment="center"
+              caption="Original Duration"
+              dataField="original_duration"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Original</div>
+                  <div style={{ textAlign: "center" }}>Duration</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              dataField="original_due_days"
+              cellRender={renderGridCellOriginalDueDays}
+              alignment="center"
+              dataType="stage"
+              width={80}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Original</div>
+                  <div style={{ textAlign: "center" }}>Due</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Original End Date"
+              dataField="original_end_date"
+              width={100}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Original</div>
+                  <div style={{ textAlign: "center" }}>End</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
           </Column>
-          <Column
-            alignment="center"
-            cellRender={renderGridCellTotalTaskDelay}
-            caption="Total Task Delay"
-            dataField="whole_delay_days"
-            width={90}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Total</div>
-                <div style={{ textAlign: "center" }}>Task</div>
-                <div style={{ textAlign: "center" }}>Delay</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            cellRender={renderGrideCellWholeTask}
-            caption="Whole Task End Date"
-            dataField="whole_end_date"
-            width={100}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Whole</div>
-                <div style={{ textAlign: "center" }}>Task</div>
-                <div style={{ textAlign: "center" }}>End</div>
-                <div style={{ textAlign: "center" }}>Date</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-        </Column>
 
-        <Column alignment="center" caption="CURRENT STAGE PROGRESS">
           <Column
             alignment="center"
-            caption="Hold Days"
-            dataField="current_hold_days"
-            width={90}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Hold</div>
-                <div style={{ textAlign: "center" }}>Days</div>
-              </div>
-            )}
+            cssClass="red-header"
+            caption="COMPLETED STAGE(S) PROGRESS"
           >
-            <HeaderFilter />
+            <Column
+              alignment="center"
+              dataField="target_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Target</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Days Taken"
+              dataField="task_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Days</div>
+                  <div style={{ textAlign: "center" }}>Taken</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              cellRender={renderGridCellTaskDelay}
+              caption="Task Delay Days"
+              dataField="delay_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Task</div>
+                  <div style={{ textAlign: "center" }}>Delay</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Task Hold Days"
+              dataField="hold_days"
+              width={80}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Task</div>
+                  <div style={{ textAlign: "center" }}>Hold</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
           </Column>
-          <Column
-            alignment="center"
-            caption="Start Date"
-            dataField="stage_start_date"
-            width={80}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Start</div>
-                <div style={{ textAlign: "center" }}>Date</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            caption="Expected End Date"
-            dataField="stage_expected_date"
-            width={110}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Expected</div>
-                <div style={{ textAlign: "center" }}>End</div>
-                <div style={{ textAlign: "center" }}>Date</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            caption="No of Update(s)"
-            dataField="no_updates"
-            width={110}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>No of</div>
-                <div style={{ textAlign: "center" }}>Update(s)</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            caption="Updated Duration"
-            dataField="whole_updated"
-            width={110}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Updated</div>
-                <div style={{ textAlign: "center" }}>Duration</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            caption="Updated Due Days"
-            dataField="whole_updated_due_days"
-            width={110}
-            headerCellRender={() => (
-              <div className="table-header">
-                <div>Updated</div>
-                <div style={{ textAlign: "center" }}>Due</div>
-                <div style={{ textAlign: "center" }}>Days</div>
-              </div>
-            )}
-          >
-            <HeaderFilter />
-          </Column>
-          <Column
-            alignment="center"
-            caption="Remarks"
-            dataField="remarks"
-            width={100}
-          >
-            <HeaderFilter />
-          </Column>
-        </Column>
 
-        <Paging enabled={false} />
-      </DataGrid>
+          <Column alignment="center" caption="WHOLE TASK PROGRESS">
+            <Column
+              alignment="center"
+              caption="Target Days"
+              dataField="whole_target_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Target</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              cellRender={renderGridCellTotalTaskDelay}
+              caption="Total Task Delay"
+              dataField="whole_delay_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Total</div>
+                  <div style={{ textAlign: "center" }}>Task</div>
+                  <div style={{ textAlign: "center" }}>Delay</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              cellRender={renderGrideCellWholeTask}
+              caption="Whole Task End Date"
+              dataField="whole_end_date"
+              width={100}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Whole</div>
+                  <div style={{ textAlign: "center" }}>Task</div>
+                  <div style={{ textAlign: "center" }}>End</div>
+                  <div style={{ textAlign: "center" }}>Date</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+          </Column>
+
+          <Column alignment="center" caption="CURRENT STAGE PROGRESS">
+            <Column
+              alignment="center"
+              caption="Hold Days"
+              dataField="current_hold_days"
+              width={90}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Hold</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Start Date"
+              dataField="stage_start_date"
+              width={80}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Start</div>
+                  <div style={{ textAlign: "center" }}>Date</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Expected End Date"
+              dataField="stage_expected_date"
+              width={110}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Expected</div>
+                  <div style={{ textAlign: "center" }}>End</div>
+                  <div style={{ textAlign: "center" }}>Date</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="No of Update(s)"
+              dataField="no_updates"
+              width={110}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>No of</div>
+                  <div style={{ textAlign: "center" }}>Update(s)</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Updated Duration"
+              dataField="whole_updated"
+              width={110}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Updated</div>
+                  <div style={{ textAlign: "center" }}>Duration</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Updated Due Days"
+              dataField="whole_updated_due_days"
+              width={110}
+              headerCellRender={() => (
+                <div className="table-header">
+                  <div>Updated</div>
+                  <div style={{ textAlign: "center" }}>Due</div>
+                  <div style={{ textAlign: "center" }}>Days</div>
+                </div>
+              )}
+            >
+              <HeaderFilter />
+            </Column>
+            <Column
+              alignment="center"
+              caption="Remarks"
+              dataField="remarks"
+              width={100}
+            >
+              <HeaderFilter />
+            </Column>
+          </Column>
+
+          <Paging enabled={false} />
+        </DataGrid>
       )}
       {/* </>
           } */}
