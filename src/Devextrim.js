@@ -34,7 +34,6 @@ const Devextrim = ({ setSelectedView, setSelectedData }) => {
   const [activeChartDefault, setActiveChartDefault] = useState(0);
   const [layoutDropDown, setLayoutDropDown] = useState([]);
   const [selectedLayout, setSelectedLayout] = useState("");
-console.log("activeChartDefault",activeChartDefault);
   const handleInputChange = (event) => {
     // Update the userName state with the new value from the input field
     setUserName(event.target.value);
@@ -371,7 +370,6 @@ console.log("activeChartDefault",activeChartDefault);
         text: e?.row?.data?.task,
         onItemClick: () => {
           const rowData = e.row.data.task;
-          console.log("rowData", rowData);
           setSelectedView("Option 2");
           setSelectedData(rowData);
         },
@@ -381,10 +379,13 @@ console.log("activeChartDefault",activeChartDefault);
   };
 
   const dataGrid = useRef(null);
-  useEffect(() => {
+  const getLayoutSelectData = () =>{
     axios.get(API_BASE_URL + `/Report/get_layouts`).then((res) => {
       setLayoutDropDown(res?.data?.data);
     });
+  }
+  useEffect(() => {
+    getLayoutSelectData()
   }, []);
 
   useEffect(() => {
@@ -415,9 +416,6 @@ console.log("activeChartDefault",activeChartDefault);
     updatedArray.forEach((item) => {
       delete item.fixed;
     });
-    // console.log("dataGridState",JSON.stringify(dataGridState));
-    // localStorage.setItem('user_layout', userName);
-    console.log("userName",userName);
 if(userName){
     const body = {
       layout_id: 0,
@@ -427,7 +425,6 @@ if(userName){
     axios
       .post(API_BASE_URL + `/report/create_update_layout`, body)
       .then((res) => {
-        // console.log("resss",res);
         toast.success("Layout save successfully.", {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -435,10 +432,20 @@ if(userName){
     }
   };
 
+  const [selectedLayoutId, setSelectedLayoutId] = useState(null);
   const handleSelectChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedLayout(selectedValue);
 
+    const selectedLayoutObject = layoutDropDown.find(
+      (layout) => layout?.layout_name === selectedValue
+    );
+
+    if (selectedLayoutObject) {
+      setSelectedLayoutId(selectedLayoutObject.layout_id);
+    } else {
+      setSelectedLayoutId(null); // Reset to null if no matching layout is found
+    }
     setTimeout(() => {
       const savedLayout = localStorage?.getItem("datagrid_layout");
       if (savedLayout) {
@@ -456,6 +463,15 @@ if(userName){
     }, 500);
   };
 
+  const deleteLayout = () =>{
+    axios
+    .delete(
+      API_BASE_URL + `/Report/delete_layout_master?layout_id=${selectedLayoutId}`
+    )
+    .then((res) => {
+      getLayoutSelectData();
+    });
+  }
   if (loader) {
     return (
       <Box
@@ -614,7 +630,7 @@ if(userName){
           onChange={handleSelectChange}
           style={{ marginRight: "10px", padding: "5px", width: "100px" }} // Adjust styles as needed
         >
-          {layoutDropDown?.map((layout) => (
+          {layoutDropDown?.map((layout, index) => (
             <option key={layout?.layout_name} value={layout?.layout_name}>
               {layout?.layout_name}
             </option>
@@ -634,10 +650,21 @@ if(userName){
         >
           Save Layout
         </button>
+        <button
+          onClick={deleteLayout}
+          style={{
+            padding: "5px",
+            backgroundColor: "red",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: "5px",
+          }} // Adjust styles as needed
+        >
+          Delete Layout
+        </button>
       </div>
-      {console.log("chartTable",chartTable)}
-      {console.log("chartTable111",itemData)}
-      {console.log("chartTable222",selectedChartData)}
+
       {!loader && (
         <DataGrid
           id="gridContainer"
